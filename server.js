@@ -14,7 +14,7 @@ var app = http.createServer(function (request, response) {
           <!doctype html>
           <html>
           <head>
-            <title>${title}</title>
+            <title>Welcome</title>
             <meta charset="utf-8">
           </head>
             <style>
