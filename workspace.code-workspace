@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "../Web"
+		},
+		{
+			"path": "../../../Downloads/notion-sdk-js-main/examples/notion-github-sync"
+		},
+		{
+			"path": "../Learn-To-Code/dinner-python"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.autoSave": "off",
+		"liveServer.settings.multiRootWorkspaceName": "Web"
+	}
+}

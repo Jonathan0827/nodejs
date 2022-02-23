@@ -1,0 +1,22 @@
+{
+	"name": "nodejs",
+	"version": "1.0.0",
+	"description": "",
+	"main": "inoutput.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node server.js",
+		"dev": "nodemon server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Jonathan0827/nodejs.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Jonathan0827/nodejs/issues"
+	},
+	"homepage": "https://github.com/Jonathan0827/nodejs#readme"
+}
