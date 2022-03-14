@@ -11,6 +11,8 @@ var Template = {
   <head>
     <title>${title}</title>
     <meta charset="utf-8">
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
   </head>
   <style>
   a {
@@ -107,7 +109,7 @@ var Template = {
 			nav = nav + `<a href="/?id=${filelist[i]}">${filelist[i]}</a>`;
 			i = i + 1;
 		}
-		if (i == 1) {
+		if (i in [1, 0]) {
 			var posts = "post";
 		} else {
 			var posts = "posts";
