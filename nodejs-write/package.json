@@ -23,6 +23,7 @@
 	},
 	"homepage": "https://jonathan0827.github.io/nodejs",
 	"dependencies": {
-		"gh-pages": "^3.2.3"
+		"gh-pages": "^3.2.3",
+		"mysql": "^2.18.1"
 	}
 }
