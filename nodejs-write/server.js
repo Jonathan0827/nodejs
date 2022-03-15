@@ -2,122 +2,8 @@ var http = require("http");
 var fs = require("fs");
 var url = require("url");
 var qs = require("querystring");
-
-var Template = {
-	HTML: function templateHTML(title, list, body, control, nav) {
-		return `
-  <!doctype html>
-  <html>
-  <head>
-    <title>${title}</title>
-    <meta charset="utf-8">
-	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-	<link rel="icon" href="/favicon.ico" type="image/x-icon">
-  </head>
-  <style>
-  a {
-	  color: blue;
-	  text-decoration: none;
-
-	  font-size: large;
-  }
-  html {
-	  font-family: Arial, Helvetica, sans-serif;
-	  text-align: center;
-  }
-  .topnav {
-	  background-color: #000000;
-	  overflow: hidden;
-  }
-  .topnav a {
-	  float: left;
-	  color: #f2f2f2;
-	  text-align: center;
-	  padding: 14px 16px;
-	  text-decoration: none;
-	  font-size: 17px;
-  }
-  .topnav span {
-	float: left;
-	color: #f2f2f2;
-	text-align: center;
-	padding: 14px 16px;
-	text-decoration: none;
-	font-size: 17px;
-}
-  .topnav a:hover {
-	  background-color: #ddd;
-	  color: black;
-  }
-
-  .topnav a.active {
-	  background-color: #af00ff;
-	  color: white;
-  }
-  </style>
-  <body>
-  	<div class="topnav">
-		<a class="active" href="/">Home</a>
-		${nav}
-	</div>
-    ${list}
-    ${body}
-	<br>
-	${control}
-	<br>
-	<input type="button" value="night" onclick="colorScheme(this)" />
-	<script>
-		document.querySelector("body").dataset.mode = "day";
-
-		var cmode = document.querySelector("body").dataset.mode;
-		function colorScheme(i) {
-			if (cmode === "day") {
-				document.querySelector("html").style.backgroundColor = "black";
-				document.querySelector("html").style.color = "white";
-				document.querySelector("html").dataset.mode = "night";
-				cmode = "night";
-				i.value = "day";
-			} else {
-				document.querySelector("html").style.backgroundColor = "white";
-				document.querySelector("html").style.color = "black";
-				document.querySelector("html").dataset.mode = "day";
-				cmode = "day";
-				i.value = "night";
-			}
-		}
-	</script>
-  </body>
-  </html>
-  `;
-	},
-	list: function templatelist(filelist) {
-		var list = "<ul>";
-		var i = 0;
-		while (i < filelist.length) {
-			list =
-				list +
-				`<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
-			i = i + 1;
-		}
-		var _list = list + "</ul>";
-		return _list;
-	},
-	navbar: function templatelist(filelist) {
-		var i = 0;
-		var nav;
-		while (i < filelist.length) {
-			nav = nav + `<a href="/?id=${filelist[i]}">${filelist[i]}</a>`;
-			i = i + 1;
-		}
-		if (i in [1, 0]) {
-			var posts = "post";
-		} else {
-			var posts = "posts";
-		}
-		var _nav = nav + `<span>${i} ${posts}</span>`;
-		return _nav;
-	},
-};
+var path = require("path");
+var Template = require("./modules/web-values.js");
 
 var app = http.createServer(function (request, response) {
 	var _url = request.url;
@@ -142,17 +28,22 @@ var app = http.createServer(function (request, response) {
 			});
 		} else {
 			fs.readdir("./data", function (error, filelist) {
+				var publicPath = path.parse(queryData.id).base;
+				var sanitizedTitle = sanitizeHtml(title);
+				var sanitizedDescription = sanitizeHtml(description, {
+					allowedTags: ["h1", "strong", "a"],
+				});
 				fs.readFile(
-					`data/${queryData.id}`,
+					`data/${publicPath}`,
 					"utf8",
 					function (err, description) {
 						var title = queryData.id;
 						var List = Template.list(filelist);
 						var template = Template.HTML(
-							title,
+							sanitizedTitle,
 							List,
-							`<h2>${title}</h2>${description}`,
-							`<a href="/create">create</a> <a href="/update?id=${title}">update</a> <form action="delete_process" method="post" onsubmit="really?"><input type="hidden" name="id" value="${title}"><input type="submit" value="delete"></form>`,
+							`<h2>${title}</h2>${sanitizedDescription}`,
+							`<a href="/create">create</a> <a href="/update?id=${sanitizedTitle}">update</a> <form action="delete_process" method="post" onsubmit="really?"><input type="hidden" name="id" value="${sanitizedTitle}"><input type="submit" value="delete"></form>`,
 							Template.navbar(filelist)
 						);
 						response.writeHead(200);
@@ -201,8 +92,9 @@ var app = http.createServer(function (request, response) {
 		});
 	} else if (pathname === "/update") {
 		fs.readdir("./data", function (error, filelist) {
+			var publicPath = path.parse(queryData.id).base;
 			fs.readFile(
-				`data/${queryData.id}`,
+				`data/${publicPath}`,
 				"utf8",
 				function (err, description) {
 					var title = queryData.id;
@@ -260,8 +152,8 @@ var app = http.createServer(function (request, response) {
 		request.on("end", function () {
 			var post = qs.parse(body);
 			var id = post.id;
-			fs.unlink(`data/${id}`, function (err) {
-				console.log("deleted");
+			var publicDel = path.parse(id).base;
+			fs.unlink(`data/${publicDel}`, function (error) {
 				response.writeHead(302, { Location: `/` });
 				response.end();
 			});
@@ -294,4 +186,7 @@ var app = http.createServer(function (request, response) {
 		`);
 	}
 });
+
 app.listen(3000);
+//Made by Jonathan Lim
+//Visit my GitHub! https://github.com/jonathan0827
