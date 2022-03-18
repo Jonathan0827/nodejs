@@ -1,9 +1,20 @@
+//This server is not working well.
+//Because of security.
 var http = require("http");
 var fs = require("fs");
 var url = require("url");
 var qs = require("querystring");
 var path = require("path");
 var Template = require("./modules/web-values.js");
+var sanitizeHtml = require("sanitize-html");
+var sql = require("mysql");
+var db = sql.createConnection({
+	host: "localhost:3000",
+	user: "root",
+	password: "0000",
+	database: "database",
+});
+// db.connect();
 
 var app = http.createServer(function (request, response) {
 	var _url = request.url;
@@ -27,30 +38,33 @@ var app = http.createServer(function (request, response) {
 				response.end(template);
 			});
 		} else {
-			fs.readdir("./data", function (error, filelist) {
-				var publicPath = path.parse(queryData.id).base;
-				var sanitizedTitle = sanitizeHtml(title);
-				var sanitizedDescription = sanitizeHtml(description, {
-					allowedTags: ["h1", "strong", "a"],
-				});
-				fs.readFile(
-					`data/${publicPath}`,
-					"utf8",
-					function (err, description) {
-						var title = queryData.id;
-						var List = Template.list(filelist);
-						var template = Template.HTML(
-							sanitizedTitle,
-							List,
-							`<h2>${title}</h2>${sanitizedDescription}`,
-							`<a href="/create">create</a> <a href="/update?id=${sanitizedTitle}">update</a> <form action="delete_process" method="post" onsubmit="really?"><input type="hidden" name="id" value="${sanitizedTitle}"><input type="submit" value="delete"></form>`,
-							Template.navbar(filelist)
-						);
-						response.writeHead(200);
-						response.end(template);
-					}
-				);
-			});
+			fs.readdir(
+				"./data",
+				function (error, filelist, title, description) {
+					var publicPath = path.parse(queryData.id).base;
+					var sanitizedTitle = sanitizeHtml(title);
+					var sanitizedDescription = sanitizeHtml(description, {
+						allowedTags: ["h1", "strong", "a"],
+					});
+					fs.readFile(
+						`data/${publicPath}`,
+						"utf8",
+						function (err, description) {
+							var title = queryData.id;
+							var List = Template.list(filelist);
+							var template = Template.HTML(
+								sanitizedTitle,
+								List,
+								`<h2>${title}</h2>${sanitizedDescription}`,
+								`<a href="/create">create</a> <a href="/update?id=${sanitizedTitle}">update</a> <form action="delete_process" method="post" onsubmit="really?"><input type="hidden" name="id" value="${sanitizedTitle}"><input type="submit" value="delete"></form>`,
+								Template.navbar(filelist)
+							);
+							response.writeHead(200);
+							response.end(template);
+						}
+					);
+				}
+			);
 		}
 	} else if (pathname === "/create") {
 		fs.readdir("./data", function (error, filelist) {
@@ -152,8 +166,9 @@ var app = http.createServer(function (request, response) {
 		request.on("end", function () {
 			var post = qs.parse(body);
 			var id = post.id;
-			var publicDel = path.parse(id).base;
-			fs.unlink(`data/${publicDel}`, function (error) {
+			// var publicDel = path.parse(id).base;
+			var publicPath = path.parse(queryData.id).base;
+			fs.unlink(`data/${publicPath}`, function (error) {
 				response.writeHead(302, { Location: `/` });
 				response.end();
 			});
