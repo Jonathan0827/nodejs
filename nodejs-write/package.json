@@ -18,10 +18,5 @@
 	"bugs": {
 		"url": "https://github.com/Jonathan0827/nodejs/issues"
 	},
-	"homepage": "https://jonathan0827.github.io/nodejs",
-	"dependencies": {
-		"gh-pages": "^3.2.3",
-		"mysql": "^2.18.1",
-		"sanitize-html": "^1.27.5"
-	}
+	"homepage": "https://github.com/Jonathan0827/nodejs#readme"
 }
